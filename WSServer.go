@@ -49,7 +49,10 @@ func handleConnect(resp http.ResponseWriter, req *http.Request) {
 	G_connMgr.AddConn(wsConn)
 
 	// 开始处理websocket消息
-	WSHandle(wsConn)
+	wsConn.WSHandle()
+
+	// 确保连接被关闭
+	wsConn.Close()
 
 	// 进行资源清理
 	G_connMgr.DelConn(wsConn)
@@ -74,7 +77,7 @@ func InitWSServer() (err error) {
 	}
 
 	// 监听端口
-	if listener, err = net.Listen("tcp", ":" + strconv.Itoa(7777)); err != nil {
+	if listener, err = net.Listen("tcp", ":" + strconv.Itoa(G_config.WsPort)); err != nil {
 		return
 	}
 

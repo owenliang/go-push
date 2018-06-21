@@ -1,0 +1,25 @@
+{
+  "websocket监听端口": "建议nginx做代理转发",
+  "wsPort": 7777,
+
+  "websocket读队列长度": "一般不需要修改",
+  "wsInChannelSize": 1000,
+
+  "WebSocket写队列长度": "一般不需要修改",
+  "wsOutChannelSize": 1000,
+
+  "内部HTTP端口": "严禁该端口暴露到外网",
+  "adminPort": 7788,
+
+  "连接分桶的数量": "桶越多, 推送的锁粒度越小, 推送并发度越高",
+  "bucketCount": 10240,
+
+  "每个桶的处理协程数量": "影响同一时刻可以有多少个不同消息被分发出去",
+  "bucketWorkerCount": 16,
+
+  "待分发队列的长度": "分发队列缓冲所有待推送的消息, 等待被分发到Bucket",
+  "dispatchChannelSize": 10000,
+
+  "分发协程的数量": "分发协程用于将待推送消息扇出给各个Bucket",
+  "dispatchWorkerCount": 16
+}
