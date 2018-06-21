@@ -9,17 +9,27 @@ import (
 
 // 每隔1秒, 检查一次连接是否健康
 func (wsConnection *WSConnection) heartbeatChecker() {
+	var (
+		timer *time.Timer
+	)
+	timer = time.NewTimer(1 * time.Second)
 	for {
-		if !wsConnection.IsAlive() {
-			break
+		select {
+		case <- timer.C:
+			if !wsConnection.IsAlive() {
+				wsConnection.Close()
+				goto EXIT
+			}
+			timer.Reset(1 * time.Second)
+		case <- wsConnection.closeChan:
+			goto EXIT
 		}
-		time.Sleep(1 * time.Second)
-		// wsConnection.QueuePushForBatch(json.RawMessage(`{"name": "owen"}`))
 	}
 
+EXIT:
 	// 确保连接被关闭
 	fmt.Println("heartbeatChecker退出:", *wsConnection)
-	wsConnection.Close()
+	timer.Stop()
 }
 
 // 按秒粒度触发合并推送
@@ -30,17 +40,15 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 		batch []json.RawMessage
 	)
 
-	timer = time.NewTimer(1 * time.Second)
+	timer = time.NewTimer(time.Duration(G_config.MaxPushDelay) * time.Millisecond)
 
 	for {
 		select {
 		case <- wsConnection.closeChan: // 需要感知socket被关闭
 			goto EXIT
 		case <- wsConnection.resetNotify: // 批次被提交, 重置定时器
-			timer.Reset(1 * time.Second)
 		case <- timer.C:	// 定时器
 			now = time.Now()
-
 			// 换出一个batch
 			batch = nil
 			wsConnection.mutex.Lock()
@@ -54,10 +62,9 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 				fmt.Println("定时提交", *wsConnection)
 				wsConnection.commitBatch(batch)
 			}
-
-			// 重置定时器
-			timer.Reset(1 * time.Second)
 		}
+		// 重置定时器
+		timer.Reset(time.Duration(G_config.MaxPushDelay) * time.Millisecond)
 	}
 EXIT:
 	fmt.Println("batchCommitChecker退出:", *wsConnection)
