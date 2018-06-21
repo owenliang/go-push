@@ -18,7 +18,7 @@ type BizMessage struct {
 
 // PUSH
 type BizPushData struct {
-	Items []json.RawMessage	`json:"items"`
+	Items []*json.RawMessage	`json:"items"`
 }
 
 // PING

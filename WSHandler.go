@@ -37,7 +37,7 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 	var (
 		now time.Time
 		timer *time.Timer
-		batch []json.RawMessage
+		batch []*json.RawMessage
 	)
 
 	timer = time.NewTimer(time.Duration(G_config.MaxPushDelay) * time.Millisecond)
@@ -54,7 +54,7 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 			wsConnection.mutex.Lock()
 			if len(wsConnection.pushBatch) != 0 {
 				batch = wsConnection.pushBatch
-				wsConnection.pushBatch = make([]json.RawMessage, 0)
+				wsConnection.pushBatch = make([]*json.RawMessage, 0)
 				wsConnection.lastCommit = now
 			}
 			wsConnection.mutex.Unlock()
@@ -146,7 +146,7 @@ ERR:
 }
 
 // 提交一批推送
-func (wsConnection *WSConnection) commitBatch(batch []json.RawMessage) (err error) {
+func (wsConnection *WSConnection) commitBatch(batch []*json.RawMessage) (err error) {
 	var (
 		buf []byte
 		bizMsg *BizMessage
@@ -182,9 +182,9 @@ ERR:
 
 // 仅用于PUSH类型的消息
 // 将推送消息做延迟发送, 在时间窗口内做消息打包合并
-func (wsConnection *WSConnection) QueuePushForBatch(singlePush json.RawMessage) (err error) {
+func (wsConnection *WSConnection) QueuePushForBatch(singlePush *json.RawMessage) (err error) {
 	var (
-		batch []json.RawMessage
+		batch []*json.RawMessage
 	)
 
 	batch = nil
@@ -196,7 +196,7 @@ func (wsConnection *WSConnection) QueuePushForBatch(singlePush json.RawMessage) 
 	// 批次已满, 立即发送
 	if len(wsConnection.pushBatch) >= G_config.MaxPushBatchSize {
 		batch = wsConnection.pushBatch
-		wsConnection.pushBatch = make([]json.RawMessage, 0)
+		wsConnection.pushBatch = make([]*json.RawMessage, 0)
 		wsConnection.lastCommit = time.Now()
 		// 通知定时commit协程, 令其重置发送定时器
 		select {
