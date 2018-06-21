@@ -16,6 +16,10 @@ type WSConnection struct {
 	isClosed bool
 
 	lastHeartbeatTime time.Time // 最近一次心跳时间
+
+	lastCommit time.Time // 上次提交batch时间
+	pushBatch []BizPushSingle	// 推送批次
+	resetNotify chan byte // 提交通知定时器重置
 }
 
 // 读websocket
@@ -78,6 +82,9 @@ func InitWSConnection(connId uint64, wsSocket *websocket.Conn) (wsConnection *WS
 		outChan: make(chan *WSMessage, G_config.WsOutChannelSize),
 		closeChan: make(chan byte),
 		lastHeartbeatTime: time.Now(),
+		lastCommit: time.Now(),
+		pushBatch: make([]BizPushSingle, 0),
+		resetNotify: make(chan byte, 1),
 	}
 
 	go wsConnection.readLoop()
@@ -121,7 +128,7 @@ func (wsConnection *WSConnection) Close() {
 	}
 }
 
-// 检查心跳
+// 检查心跳（不需要太频繁）
 func (wsConnection *WSConnection) IsAlive() bool {
 	var (
 		now = time.Now()
@@ -131,8 +138,20 @@ func (wsConnection *WSConnection) IsAlive() bool {
 	defer wsConnection.mutex.Unlock()
 
 	// 连接已关闭 或者 太久没有心跳
-	if wsConnection.isClosed || now.Sub(wsConnection.lastHeartbeatTime) > 2 * time.Second {
+	if wsConnection.isClosed || now.Sub(wsConnection.lastHeartbeatTime) > time.Duration(G_config.WsHeartbeatInterval) * time.Second {
 		return false
 	}
 	return true
+}
+
+// 更新心跳
+func (WSConnection *WSConnection) KeepAlive() {
+	var (
+		now = time.Now()
+	)
+
+	WSConnection.mutex.Lock()
+	defer WSConnection.mutex.Unlock()
+
+	WSConnection.lastHeartbeatTime = now
 }

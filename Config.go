@@ -10,6 +10,9 @@ type Config struct {
 	WsPort int `json:"wsPort"`
 	WsInChannelSize int `json:"wsInChannelSize"`
 	WsOutChannelSize int `json:"wsOutChannelSize"`
+	WsHeartbeatInterval int `json:"wsHeartbeatInterval"`
+	MaxPushDelay int `json:"maxPushDelay"`
+	MaxPushBatchSize int `json:"maxPushBatchSize"`
 	AdminPort int `json:"adminPort"`
 	BucketCount int `json:"bucketCount"`
 	BucketWorkerCount int `json:"BucketWorkerCount"`

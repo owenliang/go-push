@@ -8,6 +8,15 @@
   "WebSocket写队列长度": "一般不需要修改",
   "wsOutChannelSize": 1000,
 
+  "WebSocket心跳检查间隔": "单位秒, 超过时间没有收到心跳, 服务端将主动断开链接",
+  "wsHeartbeatInterval": 60,
+
+  "合并推送的最大延迟时间": "单位毫秒, 在抵达maxPushBatchSize之前超时则发送",
+  "maxPushDelay": 1000,
+
+  "合并推送的最大消息条数": "消息推送频次越高, 应该使用更大的合并批次, 得到更高的吞吐收益",
+  "maxPushBatchSize": 100,
+
   "内部HTTP端口": "严禁该端口暴露到外网",
   "adminPort": 7788,
 

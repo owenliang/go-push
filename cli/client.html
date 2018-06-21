@@ -30,9 +30,12 @@
                 ws.onerror = function(evt) {
                     print("ERROR: " + evt.data);
                 }
+                setInterval(function() {
+                    ws.send(JSON.stringify({type: "PING", data: {}}))
+                }, 1000)
                 return false;
             };
-            document.getElementById("send").onclick = function(evt) {
+            document.getElementById("ping").onclick = function(evt) {
                 if (!ws) {
                     return false;
                 }
