@@ -22,6 +22,7 @@ func (wsConnection *WSConnection) heartbeatChecker() {
 			}
 			timer.Reset(1 * time.Second)
 		case <- wsConnection.closeChan:
+			timer.Stop()
 			goto EXIT
 		}
 	}
@@ -29,7 +30,6 @@ func (wsConnection *WSConnection) heartbeatChecker() {
 EXIT:
 	// 确保连接被关闭
 	fmt.Println("heartbeatChecker退出:", *wsConnection)
-	timer.Stop()
 }
 
 // 按秒粒度触发合并推送
