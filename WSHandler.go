@@ -12,7 +12,7 @@ func (wsConnection *WSConnection) heartbeatChecker() {
 	var (
 		timer *time.Timer
 	)
-	timer = time.NewTimer(1 * time.Second)
+	timer = time.NewTimer(time.Duration(G_config.WsHeartbeatInterval) * time.Second)
 	for {
 		select {
 		case <- timer.C:
@@ -20,7 +20,7 @@ func (wsConnection *WSConnection) heartbeatChecker() {
 				wsConnection.Close()
 				goto EXIT
 			}
-			timer.Reset(1 * time.Second)
+			timer.Reset(time.Duration(G_config.WsHeartbeatInterval) * time.Second)
 		case <- wsConnection.closeChan:
 			timer.Stop()
 			goto EXIT
