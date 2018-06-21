@@ -77,6 +77,8 @@ func (wsConnection *WSConnection) WSHandle() {
 		message *WSMessage
 		bizReq *BizMessage
 		bizResp *BizMessage
+		bizJoinData *BizJoinData
+		bizLeaveData *BizLeaveData
 		err error
 		buf []byte
 	)
@@ -90,7 +92,7 @@ func (wsConnection *WSConnection) WSHandle() {
 			goto ERR
 		}
 
-		fmt.Println("消息", *message)
+		fmt.Println("消息", string(message.msgData))
 
 		// 只处理文本消息
 		if message.msgType != websocket.TextMessage {
@@ -121,7 +123,17 @@ func (wsConnection *WSConnection) WSHandle() {
 				Data: json.RawMessage(buf),
 			}
 		case "JOIN":
+			bizJoinData = &BizJoinData{}
+			if err = json.Unmarshal(bizReq.Data, bizJoinData); err != nil {
+				goto ERR
+			}
+			fmt.Println("JOIN:", *bizJoinData)
 		case "LEAVE":
+			bizLeaveData = &BizLeaveData{}
+			if err = json.Unmarshal(bizReq.Data, bizLeaveData); err != nil {
+				goto ERR
+			}
+			fmt.Println("LEAVE:", *bizLeaveData)
 		}
 
 		if bizResp != nil {

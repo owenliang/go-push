@@ -35,19 +35,27 @@
                 }, 1000)
                 return false;
             };
-            document.getElementById("ping").onclick = function(evt) {
-                if (!ws) {
-                    return false;
-                }
-                print("SEND: " + input.value);
-                ws.send(input.value);
-                return false;
-            };
             document.getElementById("close").onclick = function(evt) {
                 if (!ws) {
                     return false;
                 }
                 ws.close();
+                return false;
+            };
+            document.getElementById("join").onclick = function(evt) {
+                if (!ws) {
+                    return false;
+                }
+                print("JOIN: " + input.value);
+                ws.send(JSON.stringify({type: "JOIN", data: {room: input.value}}));
+                return false;
+            };
+            document.getElementById("leave").onclick = function(evt) {
+                if (!ws) {
+                    return false;
+                }
+                print("LEVAE: " + input.value);
+                ws.send(JSON.stringify({type: "LEAVE", data: {room: input.value}}));
                 return false;
             };
         });
@@ -63,8 +71,9 @@
         <form>
             <button id="open">Open</button>
             <button id="close">Close</button>
-            <input id="input" type="text" value="Hello world!">
-            <button id="send">Send</button>
+            <input id="input" type="text" value="默认房间">
+            <button id="join">JOIN</button>
+            <button id="leave">LEAVE</button>
         </form>
     </td><td valign="top" width="50%">
         <div id="output"></div>
