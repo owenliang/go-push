@@ -4,4 +4,4 @@
 
 # arch
 
-![arch](/owenliang/go-push/blob/master/GO%20push.png?raw=true)
+![arch](https://github.com/owenliang/go-push/blob/master/GO%20push.png?raw=true)
