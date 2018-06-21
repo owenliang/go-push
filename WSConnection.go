@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 	"sync"
 	"time"
+	"encoding/json"
 )
 
 type WSConnection struct {
@@ -18,7 +19,7 @@ type WSConnection struct {
 	lastHeartbeatTime time.Time // 最近一次心跳时间
 
 	lastCommit time.Time // 上次提交batch时间
-	pushBatch []BizPushSingle	// 推送批次
+	pushBatch []json.RawMessage	// 推送批次
 	resetNotify chan byte // 提交通知定时器重置
 }
 
@@ -83,7 +84,7 @@ func InitWSConnection(connId uint64, wsSocket *websocket.Conn) (wsConnection *WS
 		closeChan: make(chan byte),
 		lastHeartbeatTime: time.Now(),
 		lastCommit: time.Now(),
-		pushBatch: make([]BizPushSingle, 0),
+		pushBatch: make([]json.RawMessage, 0),
 		resetNotify: make(chan byte, 1),
 	}
 

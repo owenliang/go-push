@@ -16,12 +16,9 @@ type BizMessage struct {
 
 // Data数据类型
 
-// PUSH的单条数据
-type BizPushSingle json.RawMessage
-
 // PUSH
 type BizPushData struct {
-	Items []BizPushSingle	`json:"items"`
+	Items []json.RawMessage	`json:"items"`
 }
 
 // PING

@@ -14,10 +14,11 @@ func (wsConnection *WSConnection) heartbeatChecker() {
 			break
 		}
 		time.Sleep(1 * time.Second)
-		// wsConnection.QueuePushForBatch(BizPushSingle(`{"name": "owen"}`))
+		// wsConnection.QueuePushForBatch(json.RawMessage(`{"name": "owen"}`))
 	}
 
 	// 确保连接被关闭
+	fmt.Println("heartbeatChecker退出:", *wsConnection)
 	wsConnection.Close()
 }
 
@@ -26,7 +27,7 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 	var (
 		now time.Time
 		timer *time.Timer
-		batch []BizPushSingle
+		batch []json.RawMessage
 	)
 
 	timer = time.NewTimer(1 * time.Second)
@@ -45,7 +46,7 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 			wsConnection.mutex.Lock()
 			if len(wsConnection.pushBatch) != 0 {
 				batch = wsConnection.pushBatch
-				wsConnection.pushBatch = make([]BizPushSingle, 0)
+				wsConnection.pushBatch = make([]json.RawMessage, 0)
 				wsConnection.lastCommit = now
 			}
 			wsConnection.mutex.Unlock()
@@ -59,6 +60,7 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 		}
 	}
 EXIT:
+	fmt.Println("batchCommitChecker退出:", *wsConnection)
 	timer.Stop()
 }
 
@@ -137,7 +139,7 @@ ERR:
 }
 
 // 提交一批推送
-func (wsConnection *WSConnection) commitBatch(batch []BizPushSingle) (err error) {
+func (wsConnection *WSConnection) commitBatch(batch []json.RawMessage) (err error) {
 	var (
 		buf []byte
 		bizMsg *BizMessage
@@ -173,9 +175,9 @@ ERR:
 
 // 仅用于PUSH类型的消息
 // 将推送消息做延迟发送, 在时间窗口内做消息打包合并
-func (wsConnection *WSConnection) QueuePushForBatch(singlePush BizPushSingle) (err error) {
+func (wsConnection *WSConnection) QueuePushForBatch(singlePush json.RawMessage) (err error) {
 	var (
-		batch []BizPushSingle
+		batch []json.RawMessage
 	)
 
 	batch = nil
@@ -187,7 +189,7 @@ func (wsConnection *WSConnection) QueuePushForBatch(singlePush BizPushSingle) (e
 	// 批次已满, 立即发送
 	if len(wsConnection.pushBatch) >= G_config.MaxPushBatchSize {
 		batch = wsConnection.pushBatch
-		wsConnection.pushBatch = make([]BizPushSingle, 0)
+		wsConnection.pushBatch = make([]json.RawMessage, 0)
 		wsConnection.lastCommit = time.Now()
 		// 通知定时commit协程, 令其重置发送定时器
 		select {
