@@ -18,7 +18,7 @@
   "maxPushBatchSize": 100,
 
   "内部HTTP端口": "严禁该端口暴露到外网",
-  "adminPort": 7788,
+  "servicePort": 7788,
 
   "连接分桶的数量": "桶越多, 推送的锁粒度越小, 推送并发度越高",
   "bucketCount": 10240,

@@ -13,7 +13,7 @@ type Config struct {
 	WsHeartbeatInterval int `json:"wsHeartbeatInterval"`
 	MaxPushDelay int `json:"maxPushDelay"`
 	MaxPushBatchSize int `json:"maxPushBatchSize"`
-	AdminPort int `json:"adminPort"`
+	ServicePort int `json:"servicePort"`
 	BucketCount int `json:"bucketCount"`
 	BucketWorkerCount int `json:"bucketWorkerCount"`
 	MaxJoinRoom int`json:"maxJoinRoom"`
