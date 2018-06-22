@@ -19,6 +19,8 @@ type Config struct {
 	MaxJoinRoom int`json:"maxJoinRoom"`
 	DispatchChannelSize int `json:"dispatchChannelSize"`
 	DispatchWorkerCount int `json:"dispatchWorkerCount"`
+	BucketJobChannelSize int `json:"bucketJobChannelSize"`
+	BucketJobWorkerCount int `json:"bucketJobWorkerCount"`
 }
 
 var (

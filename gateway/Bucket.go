@@ -3,6 +3,7 @@ package gateway
 import (
 	"sync"
 	"fmt"
+	"encoding/json"
 )
 
 type Bucket struct {
@@ -78,4 +79,43 @@ func (bucket *Bucket) LeaveRoom(roomId string, wsConn *WSConnection) (err error)
 		delete(bucket.rooms, roomId)
 	}
 	return
+}
+
+// 推送给Bucket内所有用户
+func (bucket *Bucket) PushAll(pushMsg *json.RawMessage) {
+	var (
+		wsConn *WSConnection
+	)
+
+	// 锁Bucket
+	bucket.rwMutex.RLock()
+	defer bucket.rwMutex.RUnlock()
+
+	// 全量非阻塞推送
+	for _, wsConn = range bucket.id2Conn {
+		wsConn.QueuePushForBatch(pushMsg)
+	}
+}
+
+// 推送给某个房间的所有用户
+func (bucket *Bucket) PushRoom(roomId string, pushMsg *json.RawMessage) {
+	var (
+		room *Room
+		existed bool
+	)
+
+	// 锁Bucket
+	bucket.rwMutex.RLock()
+	room, existed = bucket.rooms[roomId]
+	bucket.rwMutex.RUnlock()
+
+	// 房间不存在
+	if !existed {
+		return
+	}
+
+	fmt.Println("推送房间", roomId)
+
+	// 向房间做推送
+	room.Push(pushMsg)
 }

@@ -24,14 +24,20 @@
   "bucketCount": 10240,
 
   "每个桶的处理协程数量": "影响同一时刻可以有多少个不同消息被分发出去",
-  "bucketWorkerCount": 16,
+  "bucketWorkerCount": 32,
 
   "每个连接最多加入房间数量": "目前房间ID没有校验, 所以先做简单的数量控制",
   "maxJoinRoom": 5,
 
   "待分发队列的长度": "分发队列缓冲所有待推送的消息, 等待被分发到Bucket",
-  "dispatchChannelSize": 10000,
+  "dispatchChannelSize": 100000,
 
   "分发协程的数量": "分发协程用于将待推送消息扇出给各个Bucket",
-  "dispatchWorkerCount": 16
+  "dispatchWorkerCount": 32,
+
+  "Bucket工作队列长度": "每个Bucket的分发任务放在一个独立队列中",
+  "bucketJobChannelSize": 1000,
+
+  "Bucket发送协程的数量": "每个Bucket有多个协程并发的推送消息",
+  "bucketJobWorkerCount": 32
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 	"flag"
 	"runtime"
+	"encoding/json"
 )
 
 var (
@@ -48,6 +49,14 @@ func main()  {
 
 	for {
 		time.Sleep(1 * time.Second)
+		/*
+		func() {
+			var broadcastMsg = json.RawMessage(`{"msg": "这是广播"}`)
+			gateway.G_connMgr.PushAll(&broadcastMsg)
+			var roomMsg = json.RawMessage(`{"msg": "欢迎加入默认房间!"}`)
+			gateway.G_connMgr.PushRoom("默认房间", &roomMsg)
+		}()
+		*/
 	}
 
 	os.Exit(0)

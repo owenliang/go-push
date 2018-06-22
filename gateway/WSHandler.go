@@ -258,6 +258,7 @@ func (wsConnection *WSConnection) commitBatch(batch []*json.RawMessage) (err err
 	if buf, err = json.Marshal(BizPushData{Items: batch}); err != nil {
 		goto ERR
 	}
+
 	// 生成推送消息
 	bizMsg = &BizMessage{
 		Type: "PUSH",
@@ -278,6 +279,7 @@ func (wsConnection *WSConnection) commitBatch(batch []*json.RawMessage) (err err
 	return
 
 ERR:
+	fmt.Println("批量提交失败", err)
 	return
 }
 

@@ -2,6 +2,12 @@ package gateway
 
 import "encoding/json"
 
+// 推送类型
+const (
+	PUSH_TYPE_ROOM = 1	// 推送房间
+	PUSH_TYPE_ALL = 2	// 推送在线
+)
+
 // websocket的Message对象
 type WSMessage struct {
 	msgType int
