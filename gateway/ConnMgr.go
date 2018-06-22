@@ -1,13 +1,7 @@
 package gateway
 
-import (
-	"sync"
-)
-
 // 连接管理器
 type ConnMgr struct {
-	mutex sync.Mutex
-
 	buckets []*Bucket
 }
 
