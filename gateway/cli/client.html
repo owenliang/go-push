@@ -32,7 +32,7 @@
                 }
                 setInterval(function() {
                     ws.send(JSON.stringify({type: "PING", data: {}}))
-                }, 1000)
+                }, 10000)
                 return false;
             };
             document.getElementById("close").onclick = function(evt) {

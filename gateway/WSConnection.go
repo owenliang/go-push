@@ -21,6 +21,8 @@ type WSConnection struct {
 	lastCommit time.Time // 上次提交batch时间
 	pushBatch []*json.RawMessage	// 推送批次
 	resetNotify chan byte // 提交通知定时器重置
+
+	rooms map[string]bool	// 加入了哪些房间
 }
 
 // 读websocket
@@ -86,6 +88,7 @@ func InitWSConnection(connId uint64, wsSocket *websocket.Conn) (wsConnection *WS
 		lastCommit: time.Now(),
 		pushBatch: make([]*json.RawMessage, 0),
 		resetNotify: make(chan byte, 1),
+		rooms: make(map[string]bool),
 	}
 
 	go wsConnection.readLoop()

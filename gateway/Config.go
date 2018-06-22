@@ -15,7 +15,8 @@ type Config struct {
 	MaxPushBatchSize int `json:"maxPushBatchSize"`
 	AdminPort int `json:"adminPort"`
 	BucketCount int `json:"bucketCount"`
-	BucketWorkerCount int `json:"BucketWorkerCount"`
+	BucketWorkerCount int `json:"bucketWorkerCount"`
+	MaxJoinRoom int`json:"maxJoinRoom"`
 	DispatchChannelSize int `json:"dispatchChannelSize"`
 	DispatchWorkerCount int `json:"dispatchWorkerCount"`
 }

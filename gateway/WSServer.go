@@ -45,17 +45,8 @@ func handleConnect(resp http.ResponseWriter, req *http.Request) {
 	// 初始化WebSocket的读写协程
 	wsConn = InitWSConnection(connId, wsSocket)
 
-	// 连接加入管理器, 可以推送端查找到
-	G_connMgr.AddConn(wsConn)
-
 	// 开始处理websocket消息
 	wsConn.WSHandle()
-
-	// 确保连接被关闭
-	wsConn.Close()
-
-	// 进行资源清理
-	G_connMgr.DelConn(wsConn)
 }
 
 func InitWSServer() (err error) {
