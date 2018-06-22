@@ -16,16 +16,40 @@ var (
 	G_service *Service
 )
 
-// 全量推送
+// 全量推送POST msg={}
 func handlePushAll(resp http.ResponseWriter, req *http.Request) {
-	var msg = json.RawMessage(`{"test": "这是一条测试消息"}`)
-	G_connMgr.PushAll(&msg)
+	var (
+		err error
+		msg string
+		pushMsg json.RawMessage
+	)
+	if err = req.ParseForm(); err != nil {
+		return
+	}
+
+	msg = req.PostForm.Get("msg")
+
+	pushMsg = json.RawMessage(msg)
+	G_connMgr.PushAll(&pushMsg)
 }
 
-// 房间推送
+// 房间推送POST room=xxx&msg
 func handlePushRoom(resp http.ResponseWriter, req *http.Request) {
-	var msg = json.RawMessage(`{"test": "这是一条测试消息"}`)
-	G_connMgr.PushRoom("默认房间", &msg)
+	var (
+		err error
+		room string
+		msg string
+		pushMsg json.RawMessage
+	)
+	if err = req.ParseForm(); err != nil {
+		return
+	}
+
+	room = req.PostForm.Get("room")
+	msg = req.PostForm.Get("msg")
+
+	pushMsg = json.RawMessage(msg)
+	G_connMgr.PushRoom(room, &pushMsg)
 }
 
 // 统计
