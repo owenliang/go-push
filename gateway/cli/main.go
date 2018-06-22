@@ -36,6 +36,11 @@ func main()  {
 		goto ERR
 	}
 
+	// 统计
+	if err = gateway.InitStats(); err != nil {
+		goto ERR
+	}
+
 	// 初始化连接管理器
 	if err = gateway.InitConnMgr(); err != nil {
 		goto ERR

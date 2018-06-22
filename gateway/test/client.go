@@ -25,9 +25,9 @@ func loop() {
 		}
 		// 循环读消息
 		for {
-			_, message, err := c.ReadMessage()
+			_, _, err := c.ReadMessage()
 			if err != nil {
-				log.Println("read:", err)
+				// log.Println("read:", err)
 				break
 			}
 			// log.Printf("recv: %s", message)
@@ -40,7 +40,7 @@ func main() {
 	flag.Parse()
 	log.SetFlags(0)
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10000; i++ {
 		go loop()
 	}
 

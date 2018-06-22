@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"fmt"
 	"time"
 	"github.com/gorilla/websocket"
 	"encoding/json"
@@ -29,7 +28,6 @@ func (wsConnection *WSConnection) heartbeatChecker() {
 
 EXIT:
 	// 确保连接被关闭
-	fmt.Println("heartbeatChecker退出:", *wsConnection)
 }
 
 // 按秒粒度触发合并推送
@@ -59,7 +57,6 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 			}
 			wsConnection.mutex.Unlock()
 			if batch != nil {
-				fmt.Println("定时提交", *wsConnection)
 				wsConnection.commitBatch(batch)
 			}
 		}
@@ -67,7 +64,6 @@ func (wsConnection *WSConnection) batchCommitChecker() {
 		timer.Reset(time.Duration(G_config.MaxPushDelay) * time.Millisecond)
 	}
 EXIT:
-	fmt.Println("batchCommitChecker退出:", *wsConnection)
 	timer.Stop()
 }
 
@@ -184,8 +180,6 @@ func (wsConnection *WSConnection) WSHandle() {
 			goto ERR
 		}
 
-		fmt.Println("消息", string(message.msgData))
-
 		// 只处理文本消息
 		if message.msgType != websocket.TextMessage {
 			continue
@@ -193,7 +187,6 @@ func (wsConnection *WSConnection) WSHandle() {
 
 		// 解析消息体
 		if bizReq, err = DecodeBizMessage(message.msgData); err != nil {
-			fmt.Println("反序列化失败", *message)
 			goto ERR
 		}
 
@@ -279,7 +272,6 @@ func (wsConnection *WSConnection) commitBatch(batch []*json.RawMessage) (err err
 	return
 
 ERR:
-	fmt.Println("批量提交失败", err)
 	return
 }
 
@@ -311,7 +303,6 @@ func (wsConnection *WSConnection) QueuePushForBatch(singlePush *json.RawMessage)
 	wsConnection.mutex.Unlock()
 
 	if batch != nil {
-		fmt.Println("触发提交", *wsConnection)
 		if err = wsConnection.commitBatch(batch); err != nil {
 			goto ERR
 		}

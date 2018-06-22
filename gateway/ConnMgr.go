@@ -30,8 +30,10 @@ func (connMgr *ConnMgr)dispatchWorkerMain(dispatchWorkerIdx int) {
 	for {
 		select {
 		case pushJob = <- connMgr.dispatchChan:
+			PushAllPending_DESC()
 			// 分发给所有Bucket, 若Bucket拥塞则等待
 			for bucketIdx, _ = range connMgr.buckets {
+				PushJobPending_INCR()
 				connMgr.jobChan[bucketIdx] <- pushJob
 			}
 		}
@@ -48,6 +50,7 @@ func (connMgr *ConnMgr)jobWorkerMain(jobWorkerIdx int, bucketIdx int) {
 	for {
 		select {
 		case pushJob = <-connMgr.jobChan[bucketIdx]:	// 从Bucket的job queue取出一个任务
+			PushJobPending_DESC()
 			if pushJob.pushType == PUSH_TYPE_ALL {
 				bucket.PushAll(pushJob.pushMsg)
 			} else if pushJob.pushType == PUSH_TYPE_ROOM {
@@ -147,6 +150,7 @@ func (connMgr *ConnMgr) PushAll(pushMsg *json.RawMessage) (err error) {
 
 	select {
 	case 	connMgr.dispatchChan <- pushJob:
+		PushAllPending_INCR()
 	default:
 		err = ERR_DISPATCH_CHANNEL_FULL
 	}

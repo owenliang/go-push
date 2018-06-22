@@ -27,8 +27,6 @@ func (bucket *Bucket) AddConn(wsConn *WSConnection) {
 	defer bucket.rwMutex.Unlock()
 
 	bucket.id2Conn[wsConn.connId] = wsConn
-
-	fmt.Println("AddConn", bucket.index, *wsConn)
 }
 
 func (bucket *Bucket) DelConn(wsConn *WSConnection) {
@@ -36,8 +34,6 @@ func (bucket *Bucket) DelConn(wsConn *WSConnection) {
 	defer bucket.rwMutex.Unlock()
 
 	delete(bucket.id2Conn, wsConn.connId)
-
-	fmt.Println("DelConn", bucket.index, *wsConn)
 }
 
 func (bucket *Bucket) JoinRoom(roomId string, wsConn *WSConnection) (err error) {
