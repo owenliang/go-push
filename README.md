@@ -29,7 +29,9 @@
   * gateway:
     * 增加AUTH命令，原地校验JWT完成登录
 * 四期
-  * gateway:
-    * JOIN命令增加白名单，只允许加入有效的房间
+  * logic:
+    * 接收gateway发来的会话心跳，向redis cluster存储uid所在的gateway信息
+    * 支持向uid定向推送，从redis cluter找到gateway信息，利用HTTP/2直连推送
+    
     
     
