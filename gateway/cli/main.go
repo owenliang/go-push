@@ -7,7 +7,6 @@ import (
 	"time"
 	"flag"
 	"runtime"
-	"encoding/json"
 )
 
 var (
