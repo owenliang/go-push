@@ -1,4 +1,4 @@
-package go_push
+package gateway
 
 import (
 	"github.com/gorilla/websocket"

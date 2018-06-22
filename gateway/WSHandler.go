@@ -1,4 +1,4 @@
-package go_push
+package gateway
 
 import (
 	"fmt"
@@ -70,7 +70,6 @@ EXIT:
 	fmt.Println("batchCommitChecker退出:", *wsConnection)
 	timer.Stop()
 }
-
 // 处理websocket请求
 func (wsConnection *WSConnection) WSHandle() {
 	var (

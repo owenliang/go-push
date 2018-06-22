@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/owenliang/go-push"
+	"github.com/owenliang/go-push/gateway"
 	"fmt"
 	"os"
 	"time"
@@ -32,17 +32,17 @@ func main()  {
 	initEnv()
 
 	// 加载配置
-	if err = go_push.InitConfig(confFile); err != nil {
+	if err = gateway.InitConfig(confFile); err != nil {
 		goto ERR
 	}
 
 	// 初始化连接管理器
-	if err = go_push.InitConnMgr(); err != nil {
+	if err = gateway.InitConnMgr(); err != nil {
 		goto ERR
 	}
 
 	// 初始化websocket服务器
-	if err = go_push.InitWSServer(); err != nil {
+	if err = gateway.InitWSServer(); err != nil {
 		goto ERR
 	}
 
