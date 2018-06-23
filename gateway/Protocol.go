@@ -1,6 +1,9 @@
 package gateway
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/gorilla/websocket"
+)
 
 // 推送类型
 const (
@@ -48,6 +51,17 @@ func BuildWSMessage(msgType int, msgData []byte) (wsMessage *WSMessage) {
 		msgType: msgType,
 		msgData: msgData,
 	}
+}
+
+func EncodeWSMessage(bizMessage *BizMessage) (wsMessage *WSMessage, err error){
+	var (
+		buf []byte
+	)
+	if buf, err = json.Marshal(*bizMessage); err != nil {
+		return
+	}
+	wsMessage = &WSMessage{websocket.TextMessage, buf}
+	return
 }
 
 // 解析{"type": "PING", "data": {...}}的包

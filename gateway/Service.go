@@ -30,7 +30,7 @@ func handlePushAll(resp http.ResponseWriter, req *http.Request) {
 	msg = req.PostForm.Get("msg")
 
 	pushMsg = json.RawMessage(msg)
-	pushMsg = pushMsg
+	G_merger.PushAll(&pushMsg)
 }
 
 // 房间推送POST room=xxx&msg
@@ -49,9 +49,7 @@ func handlePushRoom(resp http.ResponseWriter, req *http.Request) {
 	msg = req.PostForm.Get("msg")
 
 	pushMsg = json.RawMessage(msg)
-
-	room = room
-	pushMsg = pushMsg
+	G_merger.PushRoom(room, &pushMsg)
 }
 
 // 统计

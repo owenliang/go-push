@@ -109,8 +109,6 @@ func (bucket *Bucket) PushRoom(roomId string, pushMsg *WSMessage) {
 		return
 	}
 
-	fmt.Println("推送房间", roomId)
-
 	// 向房间做推送
 	room.Push(pushMsg)
 }

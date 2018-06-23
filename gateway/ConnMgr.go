@@ -4,7 +4,8 @@ package gateway
 type PushJob struct {
 	pushType int // 推送类型
 	roomId string // 房间ID
-	pushMsg *WSMessage 	// 要推送的WebSocket Message
+	bizMsg *BizMessage 	// 未序列化的业务消息
+	wsMsg *WSMessage //  已序列化的业务消息
 }
 
 // 连接管理器
@@ -24,10 +25,16 @@ func (connMgr *ConnMgr)dispatchWorkerMain(dispatchWorkerIdx int) {
 	var (
 		bucketIdx int
 		pushJob *PushJob
+		err error
 	)
 	for {
 		select {
 		case pushJob = <- connMgr.dispatchChan:
+			// 序列化
+			if pushJob.wsMsg, err = EncodeWSMessage(pushJob.bizMsg); err != nil {
+				continue
+			}
+
 			PushAllPending_DESC()
 			// 分发给所有Bucket, 若Bucket拥塞则等待
 			for bucketIdx, _ = range connMgr.buckets {
@@ -50,9 +57,9 @@ func (connMgr *ConnMgr)jobWorkerMain(jobWorkerIdx int, bucketIdx int) {
 		case pushJob = <-connMgr.jobChan[bucketIdx]:	// 从Bucket的job queue取出一个任务
 			PushJobPending_DESC()
 			if pushJob.pushType == PUSH_TYPE_ALL {
-				bucket.PushAll(pushJob.pushMsg)
+				bucket.PushAll(pushJob.wsMsg)
 			} else if pushJob.pushType == PUSH_TYPE_ROOM {
-				bucket.PushRoom(pushJob.roomId, pushJob.pushMsg)
+				bucket.PushRoom(pushJob.roomId, pushJob.wsMsg)
 			}
 		}
 	}
@@ -135,15 +142,15 @@ func (connMgr *ConnMgr) LeaveRoom(roomId string, wsConn *WSConnection) (err erro
 	return
 }
 
-// 向所有在线用户推送
-func (connMgr *ConnMgr) PushAll(pushMsg *WSMessage) (err error) {
+// 向所有在线用户发送消息
+func (connMgr *ConnMgr) PushAll(bizMsg *BizMessage) (err error) {
 	var (
 		pushJob *PushJob
 	)
 
 	pushJob = &PushJob{
 		pushType: PUSH_TYPE_ALL,
-		pushMsg: pushMsg,
+		bizMsg: bizMsg,
 	}
 
 	select {
@@ -155,15 +162,15 @@ func (connMgr *ConnMgr) PushAll(pushMsg *WSMessage) (err error) {
 	return
 }
 
-// 向指定房间推送
-func (connMgr *ConnMgr) PushRoom(roomId string, pushMsg *WSMessage) (err error) {
+// 向指定房间发送消息
+func (connMgr *ConnMgr) PushRoom(roomId string, bizMsg *BizMessage) (err error) {
 	var (
 		pushJob *PushJob
 	)
 
 	pushJob = &PushJob{
 		pushType: PUSH_TYPE_ROOM,
-		pushMsg: pushMsg,
+		bizMsg: bizMsg,
 		roomId: roomId,
 	}
 

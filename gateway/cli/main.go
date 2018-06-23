@@ -51,6 +51,11 @@ func main()  {
 		goto ERR
 	}
 
+	// 初始化merger合并层
+	if err = gateway.InitMerger(); err != nil {
+		goto ERR
+	}
+
 	// 初始化service接口
 	if err = gateway.InitService(); err != nil {
 		goto ERR
