@@ -12,10 +12,13 @@
   "wsHeartbeatInterval": 60,
 
   "合并推送的最大延迟时间": "单位毫秒, 在抵达maxPushBatchSize之前超时则发送",
-  "maxPushDelay": 1000,
+  "maxMergerDelay": 1000,
 
-  "合并推送的最大消息条数": "消息推送频次越高, 应该使用更大的合并批次, 得到更高的吞吐收益",
-  "maxPushBatchSize": 100,
+  "合并最多消息条数": "消息推送频次越高, 应该使用更大的合并批次, 得到更高的吞吐收益",
+  "maxMergerBatchSize": 100,
+
+  "合并协程的数量": "消息合并与json编码耗费CPU, 注意一个房间的消息只会由同一个协程处理.",
+  "mergerWorkerCount": 32,
 
   "内部HTTP端口": "严禁该端口暴露到外网",
   "servicePort": 7788,

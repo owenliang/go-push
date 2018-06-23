@@ -3,7 +3,6 @@ package gateway
 import (
 	"sync"
 	"fmt"
-	"encoding/json"
 )
 
 type Bucket struct {
@@ -78,7 +77,7 @@ func (bucket *Bucket) LeaveRoom(roomId string, wsConn *WSConnection) (err error)
 }
 
 // 推送给Bucket内所有用户
-func (bucket *Bucket) PushAll(pushMsg *json.RawMessage) {
+func (bucket *Bucket) PushAll(pushMsg *WSMessage) {
 	var (
 		wsConn *WSConnection
 	)
@@ -89,12 +88,12 @@ func (bucket *Bucket) PushAll(pushMsg *json.RawMessage) {
 
 	// 全量非阻塞推送
 	for _, wsConn = range bucket.id2Conn {
-		wsConn.QueuePushForBatch(pushMsg)
+		wsConn.SendMessage(pushMsg)
 	}
 }
 
 // 推送给某个房间的所有用户
-func (bucket *Bucket) PushRoom(roomId string, pushMsg *json.RawMessage) {
+func (bucket *Bucket) PushRoom(roomId string, pushMsg *WSMessage) {
 	var (
 		room *Room
 		existed bool

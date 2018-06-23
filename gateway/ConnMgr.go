@@ -1,12 +1,10 @@
 package gateway
 
-import "encoding/json"
-
 // 推送任务
 type PushJob struct {
 	pushType int // 推送类型
 	roomId string // 房间ID
-	pushMsg *json.RawMessage	// 要推送的消息体
+	pushMsg *WSMessage 	// 要推送的WebSocket Message
 }
 
 // 连接管理器
@@ -138,7 +136,7 @@ func (connMgr *ConnMgr) LeaveRoom(roomId string, wsConn *WSConnection) (err erro
 }
 
 // 向所有在线用户推送
-func (connMgr *ConnMgr) PushAll(pushMsg *json.RawMessage) (err error) {
+func (connMgr *ConnMgr) PushAll(pushMsg *WSMessage) (err error) {
 	var (
 		pushJob *PushJob
 	)
@@ -158,7 +156,7 @@ func (connMgr *ConnMgr) PushAll(pushMsg *json.RawMessage) (err error) {
 }
 
 // 向指定房间推送
-func (connMgr *ConnMgr) PushRoom(roomId string, pushMsg *json.RawMessage) (err error) {
+func (connMgr *ConnMgr) PushRoom(roomId string, pushMsg *WSMessage) (err error) {
 	var (
 		pushJob *PushJob
 	)

@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"sync"
-	"encoding/json"
 )
 
 // 房间
@@ -61,7 +60,7 @@ func (room *Room) Count() int {
 	return len(room.id2Conn)
 }
 
-func (room *Room) Push(pushMsg *json.RawMessage) {
+func (room *Room) Push(pushMsg *WSMessage) {
 	var (
 		wsConn *WSConnection
 	)
@@ -69,6 +68,6 @@ func (room *Room) Push(pushMsg *json.RawMessage) {
 	defer room.rwMutex.RUnlock()
 
 	for _, wsConn = range room.id2Conn {
-		wsConn.QueuePushForBatch(pushMsg)
+		wsConn.SendMessage(pushMsg)
 	}
 }

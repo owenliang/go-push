@@ -11,8 +11,9 @@ type Config struct {
 	WsInChannelSize int `json:"wsInChannelSize"`
 	WsOutChannelSize int `json:"wsOutChannelSize"`
 	WsHeartbeatInterval int `json:"wsHeartbeatInterval"`
-	MaxPushDelay int `json:"maxPushDelay"`
-	MaxPushBatchSize int `json:"maxPushBatchSize"`
+	MaxMergerDelay int `json:"maxMergerDelay"`
+	MaxMergerBatchSize int `json:"maxMergerBatchSize"`
+	MergerWorkerCount int `json:"mergerWorkerCount"`
 	ServicePort int `json:"servicePort"`
 	BucketCount int `json:"bucketCount"`
 	BucketWorkerCount int `json:"bucketWorkerCount"`
