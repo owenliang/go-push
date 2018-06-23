@@ -4,8 +4,10 @@ package gateway
 type PushJob struct {
 	pushType int // 推送类型
 	roomId string // 房间ID
+	// union {
 	bizMsg *BizMessage 	// 未序列化的业务消息
 	wsMsg *WSMessage //  已序列化的业务消息
+	// }
 }
 
 // 连接管理器
@@ -30,12 +32,12 @@ func (connMgr *ConnMgr)dispatchWorkerMain(dispatchWorkerIdx int) {
 	for {
 		select {
 		case pushJob = <- connMgr.dispatchChan:
+			PushAllPending_DESC()
+
 			// 序列化
 			if pushJob.wsMsg, err = EncodeWSMessage(pushJob.bizMsg); err != nil {
 				continue
 			}
-
-			PushAllPending_DESC()
 			// 分发给所有Bucket, 若Bucket拥塞则等待
 			for bucketIdx, _ = range connMgr.buckets {
 				PushJobPending_INCR()

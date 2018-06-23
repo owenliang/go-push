@@ -60,7 +60,7 @@ func (room *Room) Count() int {
 	return len(room.id2Conn)
 }
 
-func (room *Room) Push(pushMsg *WSMessage) {
+func (room *Room) Push(wsMsg *WSMessage) {
 	var (
 		wsConn *WSConnection
 	)
@@ -68,6 +68,6 @@ func (room *Room) Push(pushMsg *WSMessage) {
 	defer room.rwMutex.RUnlock()
 
 	for _, wsConn = range room.id2Conn {
-		wsConn.SendMessage(pushMsg)
+		wsConn.SendMessage(wsMsg)
 	}
 }

@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"sync"
-	"fmt"
 )
 
 type Bucket struct {
@@ -77,7 +76,7 @@ func (bucket *Bucket) LeaveRoom(roomId string, wsConn *WSConnection) (err error)
 }
 
 // 推送给Bucket内所有用户
-func (bucket *Bucket) PushAll(pushMsg *WSMessage) {
+func (bucket *Bucket) PushAll(wsMsg *WSMessage) {
 	var (
 		wsConn *WSConnection
 	)
@@ -88,12 +87,12 @@ func (bucket *Bucket) PushAll(pushMsg *WSMessage) {
 
 	// 全量非阻塞推送
 	for _, wsConn = range bucket.id2Conn {
-		wsConn.SendMessage(pushMsg)
+		wsConn.SendMessage(wsMsg)
 	}
 }
 
 // 推送给某个房间的所有用户
-func (bucket *Bucket) PushRoom(roomId string, pushMsg *WSMessage) {
+func (bucket *Bucket) PushRoom(roomId string, wsMsg *WSMessage) {
 	var (
 		room *Room
 		existed bool
@@ -110,5 +109,5 @@ func (bucket *Bucket) PushRoom(roomId string, pushMsg *WSMessage) {
 	}
 
 	// 向房间做推送
-	room.Push(pushMsg)
+	room.Push(wsMsg)
 }

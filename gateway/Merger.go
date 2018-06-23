@@ -102,7 +102,7 @@ func (worker *MergeWorker) mergeWorkerMain() {
 			} else if worker.mergeType == PUSH_TYPE_ALL {	// 广播合并
 				batch = worker.allBatch
 				if batch == nil {
-					batch= &PushBatch{}
+					batch = &PushBatch{}
 					worker.allBatch = batch
 					isCreated = true
 				}
