@@ -6,6 +6,7 @@ import (
 	"time"
 	"net/url"
 	"strconv"
+	"golang.org/x/net/http2"
 )
 
 // 与网关之间的通讯
@@ -15,18 +16,26 @@ type GateConn struct {
 }
 
 func InitGateConn(gatewayConfig *GatewayConfig) (gateConn *GateConn, err error) {
+	var (
+		transport *http.Transport
+	)
+
 	gateConn = &GateConn{
 		schema: "https://" + gatewayConfig.Hostname + ":" + strconv.Itoa(gatewayConfig.Port),
 	}
 
+	transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true,},	// 不校验服务端证书
+		MaxIdleConns: G_config.GatewayMaxConnection,
+		MaxIdleConnsPerHost: G_config.GatewayMaxConnection,
+		IdleConnTimeout: time.Duration(G_config.GatewayIdleTimeout) * time.Second,	// 连接空闲超时
+	}
+	// 启动HTTP/2协议
+	http2.ConfigureTransport(transport)
+
 	// HTTP/2 客户端
 	gateConn.client = &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true,},	// 不校验服务端证书
-			MaxIdleConns: G_config.GatewayMaxConnection,
-			MaxIdleConnsPerHost: G_config.GatewayMaxConnection,
-			IdleConnTimeout: time.Duration(G_config.GatewayIdleTimeout) * time.Second,	// 连接空闲超时
-		},
+		Transport: transport,
 		Timeout: time.Duration(G_config.GatewayTimeout) * time.Millisecond, // 请求超时
 	}
 	return
