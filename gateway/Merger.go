@@ -3,6 +3,7 @@ package gateway
 import (
 	"encoding/json"
 	"time"
+	"github.com/owenliang/go-push/common"
 )
 
 type PushBatch struct {
@@ -52,28 +53,28 @@ func (worker *MergeWorker) autoCommit(batch *PushBatch) func() {
 
 func (worker *MergeWorker) commitBatch(batch *PushBatch) (err error) {
 	var (
-		bizPushData *BizPushData
-		bizMessage *BizMessage
+		bizPushData *common.BizPushData
+		bizMessage *common.BizMessage
 		buf []byte
 	)
 
-	bizPushData = &BizPushData{
+	bizPushData = &common.BizPushData{
 		Items: batch.items,
 	}
 	if buf, err = json.Marshal(*bizPushData); err != nil {
 		return
 	}
 
-	bizMessage = &BizMessage{
+	bizMessage = &common.BizMessage{
 		Type: "PUSH",
 		Data: json.RawMessage(buf),
 	}
 
 	// 打包发送
-	if worker.mergeType == PUSH_TYPE_ROOM {
+	if worker.mergeType == common.PUSH_TYPE_ROOM {
 		delete(worker.room2Batch, batch.room)
 		err = G_connMgr.PushRoom(batch.room, bizMessage)
-	} else if worker.mergeType == PUSH_TYPE_ALL {
+	} else if worker.mergeType == common.PUSH_TYPE_ALL {
 		worker.allBatch = nil
 		err = G_connMgr.PushAll(bizMessage)
 	}
@@ -93,13 +94,13 @@ func (worker *MergeWorker) mergeWorkerMain() {
 		case context = <- worker.contextChan:
 			isCreated = false
 			// 按房间合并
-			if worker.mergeType == PUSH_TYPE_ROOM {
+			if worker.mergeType == common.PUSH_TYPE_ROOM {
 				if batch, existed = worker.room2Batch[context.room]; !existed {
 					batch = &PushBatch{room: context.room}
 					worker.room2Batch[context.room] = batch
 					isCreated = true
 				}
-			} else if worker.mergeType == PUSH_TYPE_ALL {	// 广播合并
+			} else if worker.mergeType == common.PUSH_TYPE_ALL {	// 广播合并
 				batch = worker.allBatch
 				if batch == nil {
 					batch = &PushBatch{}
@@ -124,7 +125,7 @@ func (worker *MergeWorker) mergeWorkerMain() {
 			// 批次已满, 取消超时自动提交
 			batch.commitTimer.Stop()
 		case timeoutBatch = <- worker.timeoutChan:
-			if worker.mergeType == PUSH_TYPE_ROOM {
+			if worker.mergeType == common.PUSH_TYPE_ROOM {
 				// 定时器触发时, 批次已被提交
 				if batch, existed = worker.room2Batch[timeoutBatch.room]; !existed {
 					continue
@@ -134,7 +135,7 @@ func (worker *MergeWorker) mergeWorkerMain() {
 				if batch != timeoutBatch {
 					continue
 				}
-			} else if worker.mergeType == PUSH_TYPE_ALL {
+			} else if worker.mergeType == common.PUSH_TYPE_ALL {
 				batch = worker.allBatch
 				// 定时器触发时, 批次已被提交
 				if timeoutBatch != batch {
@@ -169,7 +170,7 @@ func (worker *MergeWorker) pushRoom(room string, msg *json.RawMessage) (err erro
 	select {
 	case worker.contextChan <- context:
 	default:
-		err = ERR_MERGE_CHANNEL_FULL
+		err = common.ERR_MERGE_CHANNEL_FULL
 	}
 	return
 }
@@ -184,7 +185,7 @@ func (worker *MergeWorker) pushAll(msg *json.RawMessage) (err error) {
 	select {
 	case worker.contextChan <- context:
 	default:
-		err = ERR_MERGE_CHANNEL_FULL
+		err = common.ERR_MERGE_CHANNEL_FULL
 	}
 	return
 }
@@ -203,9 +204,9 @@ func InitMerger() (err error) {
 		roomWorkers: make([]*MergeWorker, G_config.MergerWorkerCount),
 	}
 	for workerIdx = 0; workerIdx < G_config.MergerWorkerCount; workerIdx++ {
-		merger.roomWorkers[workerIdx] = initMergeWorker(PUSH_TYPE_ROOM)
+		merger.roomWorkers[workerIdx] = initMergeWorker(common.PUSH_TYPE_ROOM)
 	}
-	merger.broadcastWorker = initMergeWorker(PUSH_TYPE_ALL)
+	merger.broadcastWorker = initMergeWorker(common.PUSH_TYPE_ALL)
 
 	G_merger = merger
 	return

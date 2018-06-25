@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"sync"
+	"github.com/owenliang/go-push/common"
 )
 
 type Bucket struct {
@@ -62,7 +63,7 @@ func (bucket *Bucket) LeaveRoom(roomId string, wsConn *WSConnection) (err error)
 
 	// 找到房间
 	if room, existed = bucket.rooms[roomId]; !existed {
-		err = ERR_NOT_IN_ROOM
+		err = common.ERR_NOT_IN_ROOM
 		return
 	}
 
@@ -76,7 +77,7 @@ func (bucket *Bucket) LeaveRoom(roomId string, wsConn *WSConnection) (err error)
 }
 
 // 推送给Bucket内所有用户
-func (bucket *Bucket) PushAll(wsMsg *WSMessage) {
+func (bucket *Bucket) PushAll(wsMsg *common.WSMessage) {
 	var (
 		wsConn *WSConnection
 	)
@@ -92,7 +93,7 @@ func (bucket *Bucket) PushAll(wsMsg *WSMessage) {
 }
 
 // 推送给某个房间的所有用户
-func (bucket *Bucket) PushRoom(roomId string, wsMsg *WSMessage) {
+func (bucket *Bucket) PushRoom(roomId string, wsMsg *common.WSMessage) {
 	var (
 		room *Room
 		existed bool

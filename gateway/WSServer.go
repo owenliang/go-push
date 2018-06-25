@@ -62,8 +62,8 @@ func InitWSServer() (err error) {
 
 	// HTTP服务
 	server = &http.Server{
-		ReadTimeout: time.Duration(2000) * time.Millisecond,
-		WriteTimeout: time.Duration(2000) * time.Millisecond,
+		ReadTimeout: time.Duration(G_config.WsReadTimeout) * time.Millisecond,
+		WriteTimeout: time.Duration(G_config.WsWriteTimeout) * time.Millisecond,
 		Handler: mux,
 	}
 

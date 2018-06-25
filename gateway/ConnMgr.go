@@ -1,12 +1,14 @@
 package gateway
 
+import "github.com/owenliang/go-push/common"
+
 // 推送任务
 type PushJob struct {
 	pushType int // 推送类型
 	roomId string // 房间ID
 	// union {
-	bizMsg *BizMessage 	// 未序列化的业务消息
-	wsMsg *WSMessage //  已序列化的业务消息
+	bizMsg *common.BizMessage 	// 未序列化的业务消息
+	wsMsg *common.WSMessage //  已序列化的业务消息
 	// }
 }
 
@@ -35,7 +37,7 @@ func (connMgr *ConnMgr)dispatchWorkerMain(dispatchWorkerIdx int) {
 			PushAllPending_DESC()
 
 			// 序列化
-			if pushJob.wsMsg, err = EncodeWSMessage(pushJob.bizMsg); err != nil {
+			if pushJob.wsMsg, err = common.EncodeWSMessage(pushJob.bizMsg); err != nil {
 				continue
 			}
 			// 分发给所有Bucket, 若Bucket拥塞则等待
@@ -58,9 +60,9 @@ func (connMgr *ConnMgr)jobWorkerMain(jobWorkerIdx int, bucketIdx int) {
 		select {
 		case pushJob = <-connMgr.jobChan[bucketIdx]:	// 从Bucket的job queue取出一个任务
 			PushJobPending_DESC()
-			if pushJob.pushType == PUSH_TYPE_ALL {
+			if pushJob.pushType == common.PUSH_TYPE_ALL {
 				bucket.PushAll(pushJob.wsMsg)
-			} else if pushJob.pushType == PUSH_TYPE_ROOM {
+			} else if pushJob.pushType == common.PUSH_TYPE_ROOM {
 				bucket.PushRoom(pushJob.roomId, pushJob.wsMsg)
 			}
 		}
@@ -145,13 +147,13 @@ func (connMgr *ConnMgr) LeaveRoom(roomId string, wsConn *WSConnection) (err erro
 }
 
 // 向所有在线用户发送消息
-func (connMgr *ConnMgr) PushAll(bizMsg *BizMessage) (err error) {
+func (connMgr *ConnMgr) PushAll(bizMsg *common.BizMessage) (err error) {
 	var (
 		pushJob *PushJob
 	)
 
 	pushJob = &PushJob{
-		pushType: PUSH_TYPE_ALL,
+		pushType: common.PUSH_TYPE_ALL,
 		bizMsg: bizMsg,
 	}
 
@@ -159,19 +161,19 @@ func (connMgr *ConnMgr) PushAll(bizMsg *BizMessage) (err error) {
 	case 	connMgr.dispatchChan <- pushJob:
 		PushAllPending_INCR()
 	default:
-		err = ERR_DISPATCH_CHANNEL_FULL
+		err = common.ERR_DISPATCH_CHANNEL_FULL
 	}
 	return
 }
 
 // 向指定房间发送消息
-func (connMgr *ConnMgr) PushRoom(roomId string, bizMsg *BizMessage) (err error) {
+func (connMgr *ConnMgr) PushRoom(roomId string, bizMsg *common.BizMessage) (err error) {
 	var (
 		pushJob *PushJob
 	)
 
 	pushJob = &PushJob{
-		pushType: PUSH_TYPE_ROOM,
+		pushType: common.PUSH_TYPE_ROOM,
 		bizMsg: bizMsg,
 		roomId: roomId,
 	}
@@ -179,7 +181,7 @@ func (connMgr *ConnMgr) PushRoom(roomId string, bizMsg *BizMessage) (err error) 
 	select {
 	case 	connMgr.dispatchChan <- pushJob:
 	default:
-		err = ERR_DISPATCH_CHANNEL_FULL
+		err = common.ERR_DISPATCH_CHANNEL_FULL
 	}
 	return
 }

@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/gorilla/websocket"
 	"encoding/json"
+	"github.com/owenliang/go-push/common"
 )
 
 // 每隔1秒, 检查一次连接是否健康
@@ -31,17 +32,17 @@ EXIT:
 }
 
 // 处理PING请求
-func (wsConnection *WSConnection) handlePing(bizReq *BizMessage) (bizResp *BizMessage, err error) {
+func (wsConnection *WSConnection) handlePing(bizReq *common.BizMessage) (bizResp *common.BizMessage, err error) {
 	var (
 		buf []byte
 	)
 
 	wsConnection.KeepAlive()
 
-	if buf, err = json.Marshal(BizPongData{}); err != nil {
+	if buf, err = json.Marshal(common.BizPongData{}); err != nil {
 		return
 	}
-	bizResp = &BizMessage{
+	bizResp = &common.BizMessage{
 		Type: "PONG",
 		Data: json.RawMessage(buf),
 	}
@@ -49,17 +50,17 @@ func (wsConnection *WSConnection) handlePing(bizReq *BizMessage) (bizResp *BizMe
 }
 
 // 处理JOIN请求
-func (wsConnection *WSConnection) handleJoin(bizReq *BizMessage) (bizResp *BizMessage, err error) {
+func (wsConnection *WSConnection) handleJoin(bizReq *common.BizMessage) (bizResp *common.BizMessage, err error) {
 	var (
-		bizJoinData *BizJoinData
+		bizJoinData *common.BizJoinData
 		existed bool
 	)
-	bizJoinData = &BizJoinData{}
+	bizJoinData = &common.BizJoinData{}
 	if err = json.Unmarshal(bizReq.Data, bizJoinData); err != nil {
 		return
 	}
 	if len(bizJoinData.Room) == 0 {
-		err = ERR_ROOM_ID_INVALID
+		err = common.ERR_ROOM_ID_INVALID
 		return
 	}
 	if len(wsConnection.rooms) >= G_config.MaxJoinRoom {
@@ -81,17 +82,17 @@ func (wsConnection *WSConnection) handleJoin(bizReq *BizMessage) (bizResp *BizMe
 }
 
 // 处理LEAVE请求
-func (wsConnection *WSConnection) handleLeave(bizReq *BizMessage) (bizResp *BizMessage, err error) {
+func (wsConnection *WSConnection) handleLeave(bizReq *common.BizMessage) (bizResp *common.BizMessage, err error) {
 	var (
-		bizLeaveData *BizLeaveData
+		bizLeaveData *common.BizLeaveData
 		existed bool
 	)
-	bizLeaveData = &BizLeaveData{}
+	bizLeaveData = &common.BizLeaveData{}
 	if err = json.Unmarshal(bizReq.Data, bizLeaveData); err != nil {
 		return
 	}
 	if len(bizLeaveData.Room) == 0 {
-		err = ERR_ROOM_ID_INVALID
+		err = common.ERR_ROOM_ID_INVALID
 		return
 	}
 	// 未加入过
@@ -122,9 +123,9 @@ func (wsConnection *WSConnection) leaveAll() {
 // 处理websocket请求
 func (wsConnection *WSConnection) WSHandle() {
 	var (
-		message *WSMessage
-		bizReq *BizMessage
-		bizResp *BizMessage
+		message *common.WSMessage
+		bizReq *common.BizMessage
+		bizResp *common.BizMessage
 		err error
 		buf []byte
 	)
@@ -142,12 +143,12 @@ func (wsConnection *WSConnection) WSHandle() {
 		}
 
 		// 只处理文本消息
-		if message.msgType != websocket.TextMessage {
+		if message.MsgType != websocket.TextMessage {
 			continue
 		}
 
 		// 解析消息体
-		if bizReq, err = DecodeBizMessage(message.msgData); err != nil {
+		if bizReq, err = common.DecodeBizMessage(message.MsgData); err != nil {
 			goto ERR
 		}
 
@@ -178,8 +179,8 @@ func (wsConnection *WSConnection) WSHandle() {
 				goto ERR
 			}
 			// socket缓冲区写满不是致命错误
-			if err = wsConnection.SendMessage(&WSMessage{websocket.TextMessage, buf}); err != nil {
-				if err != ERR_SEND_MESSAGE_FULL {
+			if err = wsConnection.SendMessage(&common.WSMessage{websocket.TextMessage, buf}); err != nil {
+				if err != common.ERR_SEND_MESSAGE_FULL {
 					goto ERR
 				} else {
 					err = nil

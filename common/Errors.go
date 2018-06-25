@@ -1,4 +1,4 @@
-package gateway
+package common
 
 import "errors"
 
@@ -18,4 +18,6 @@ var (
 	ERR_MERGE_CHANNEL_FULL = errors.New("ERR_MERGE_CHANNEL_FULL")
 
 	ERR_CERT_INVALID = errors.New("ERR_CERT_INVALID")
+
+	ERR_LOGIC_DISPATCH_CHANNEL_FULL = errors.New("ERR_LOGIC_DISPATCH_CHANNEL_FULL")
 )

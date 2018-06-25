@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"sync"
+	"github.com/owenliang/go-push/common"
 )
 
 // 房间
@@ -28,7 +29,7 @@ func (room *Room) Join(wsConn *WSConnection) (err error) {
 	defer room.rwMutex.Unlock()
 
 	if _, existed = room.id2Conn[wsConn.connId]; existed {
-		err = ERR_JOIN_ROOM_TWICE
+		err = common.ERR_JOIN_ROOM_TWICE
 		return
 	}
 
@@ -45,7 +46,7 @@ func (room *Room) Leave(wsConn* WSConnection) (err error) {
 	defer room.rwMutex.Unlock()
 
 	if _, existed = room.id2Conn[wsConn.connId]; !existed {
-		err = ERR_NOT_IN_ROOM
+		err = common.ERR_NOT_IN_ROOM
 		return
 	}
 
@@ -60,7 +61,7 @@ func (room *Room) Count() int {
 	return len(room.id2Conn)
 }
 
-func (room *Room) Push(wsMsg *WSMessage) {
+func (room *Room) Push(wsMsg *common.WSMessage) {
 	var (
 		wsConn *WSConnection
 	)

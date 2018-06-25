@@ -6,6 +6,7 @@ import (
 	"flag"
 	"runtime"
 	"time"
+	"github.com/owenliang/go-push/logic"
 )
 
 var (
@@ -30,7 +31,17 @@ func main()  {
 	initArgs()
 	initEnv()
 
-	goto ERR
+	if err = logic.InitConfig(confFile); err != nil {
+		goto ERR
+	}
+
+	if err = logic.InitGateConnMgr(); err != nil {
+		goto ERR
+	}
+
+	if err = logic.InitService(); err != nil {
+		goto ERR
+	}
 
 	for {
 		time.Sleep(1 * time.Second)

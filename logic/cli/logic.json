@@ -2,6 +2,12 @@
   "HTTP/1服务端口": "接收业务方调用",
   "servicePort": 7799,
 
+  "接口读超时": "单位毫秒",
+  "serviceReadTimeout": 2000,
+
+  "接口写超时": "单位毫秒",
+  "serviceWriteTimeout": 2000,
+
   "网关列表": "推送将分发给所有网关",
   "gatewayList": [
     {
@@ -9,6 +15,21 @@
       "port": 7788
     }
   ],
+
+  "每个网关的最多并发连接数": "建议与gateway的CPU核数相等, 提升内部通讯吞吐",
+  "gatewayMaxConnection": 32,
+
+  "网关单个请求的超时时间": "单位是毫秒",
+  "gatewayTimeout": 3000,
+
+  "网关连接的空闲关闭时间": "单位是秒",
+  "gatewayIdleTimeout": 60,
+
+  "向各个网关分发消息的协程数量": "CPU密集型, 与CPU个数相当即可",
+  "gatewayDispatchWorkerCount": 32,
+
+  "待分发消息队列长度": "分发本身很快, 队列不需要太大",
+  "gatewayDispatchChannelSize": 100000,
 
   "每个网关的最大拥塞推送数": "当消息拥塞时, 后续发往该网关的消息将被丢弃",
   "gatewayMaxPendingCount": 200000,

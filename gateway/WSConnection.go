@@ -4,14 +4,15 @@ import (
 	"github.com/gorilla/websocket"
 	"sync"
 	"time"
+	"github.com/owenliang/go-push/common"
 )
 
 type WSConnection struct {
 	mutex sync.Mutex
 	connId uint64
 	wsSocket *websocket.Conn
-	inChan chan*WSMessage
-	outChan chan*WSMessage
+	inChan chan*common.WSMessage
+	outChan chan*common.WSMessage
 	closeChan chan byte
 	isClosed bool
 	lastHeartbeatTime time.Time // 最近一次心跳时间
@@ -23,7 +24,7 @@ func (wsConnection *WSConnection) readLoop() {
 	var (
 		msgType int
 		msgData []byte
-		message *WSMessage
+		message *common.WSMessage
 		err error
 	)
 	for {
@@ -31,7 +32,7 @@ func (wsConnection *WSConnection) readLoop() {
 			goto ERR
 		}
 
-		message = BuildWSMessage(msgType, msgData)
+		message = common.BuildWSMessage(msgType, msgData)
 
 		select {
 		case wsConnection.inChan <- message:
@@ -48,13 +49,13 @@ CLOSED:
 // 写websocket
 func (wsConnection *WSConnection) writeLoop() {
 	var (
-		message *WSMessage
+		message *common.WSMessage
 		err error
 	)
 	for {
 		select {
 		case message = <- wsConnection.outChan:
-			if err = wsConnection.wsSocket.WriteMessage(message.msgType, message.msgData); err != nil {
+			if err = wsConnection.wsSocket.WriteMessage(message.MsgType, message.MsgData); err != nil {
 				goto ERR
 			}
 		case <- wsConnection.closeChan:
@@ -74,8 +75,8 @@ func InitWSConnection(connId uint64, wsSocket *websocket.Conn) (wsConnection *WS
 	wsConnection = &WSConnection{
 		wsSocket: wsSocket,
 		connId: connId,
-		inChan: make(chan *WSMessage, G_config.WsInChannelSize),
-		outChan: make(chan *WSMessage, G_config.WsOutChannelSize),
+		inChan: make(chan *common.WSMessage, G_config.WsInChannelSize),
+		outChan: make(chan *common.WSMessage, G_config.WsOutChannelSize),
 		closeChan: make(chan byte),
 		lastHeartbeatTime: time.Now(),
 		rooms: make(map[string]bool),
@@ -88,23 +89,23 @@ func InitWSConnection(connId uint64, wsSocket *websocket.Conn) (wsConnection *WS
 }
 
 // 发送消息
-func (wsConnection *WSConnection) SendMessage(message *WSMessage) (err error) {
+func (wsConnection *WSConnection) SendMessage(message *common.WSMessage) (err error) {
 	select {
 	case wsConnection.outChan <- message:
 	case <- wsConnection.closeChan:
-		err = ERR_CONNECTION_LOSS
+		err = common.ERR_CONNECTION_LOSS
 	default:	// 写操作不会阻塞, 因为channel已经预留给websocket一定的缓冲空间
-		err = ERR_SEND_MESSAGE_FULL
+		err = common.ERR_SEND_MESSAGE_FULL
 	}
 	return
 }
 
 // 读取消息
-func (wsConnection *WSConnection) ReadMessage() (message *WSMessage, err error) {
+func (wsConnection *WSConnection) ReadMessage() (message *common.WSMessage, err error) {
 	select {
 	case message = <- wsConnection.inChan:
 	case <- wsConnection.closeChan:
-		err = ERR_CONNECTION_LOSS
+		err = common.ERR_CONNECTION_LOSS
 	}
 	return
 }

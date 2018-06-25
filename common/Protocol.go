@@ -1,4 +1,4 @@
-package gateway
+package common
 
 import (
 	"encoding/json"
@@ -13,8 +13,8 @@ const (
 
 // websocket的Message对象
 type WSMessage struct {
-	msgType int
-	msgData []byte
+	MsgType int
+	MsgData []byte
 }
 
 // 业务消息的固定格式(type+data)
@@ -48,8 +48,8 @@ type BizLeaveData struct {
 
 func BuildWSMessage(msgType int, msgData []byte) (wsMessage *WSMessage) {
 	return &WSMessage{
-		msgType: msgType,
-		msgData: msgData,
+		MsgType: msgType,
+		MsgData: msgData,
 	}
 }
 

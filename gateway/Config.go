@@ -8,6 +8,8 @@ import (
 // 程序配置
 type Config struct {
 	WsPort int `json:"wsPort"`
+	WsReadTimeout int `json:"wsReadTimeout"`
+	WsWriteTimeout int `json:"wsWriteTimeout"`
 	WsInChannelSize int `json:"wsInChannelSize"`
 	WsOutChannelSize int `json:"wsOutChannelSize"`
 	WsHeartbeatInterval int `json:"wsHeartbeatInterval"`
@@ -16,6 +18,8 @@ type Config struct {
 	MergerWorkerCount int `json:"mergerWorkerCount"`
 	MergerChannelSize int `json:"mergerChannelSize"`
 	ServicePort int `json:"servicePort"`
+	ServiceReadTimeout int `json:"serviceReadTimeout"`
+	ServiceWriteTimeout int `json:"serviceWriteTimeout"`
 	ServerPem string `json:"serverPem"`
 	ServerKey string `json:"serverKey"`
 	BucketCount int `json:"bucketCount"`

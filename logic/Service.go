@@ -1,4 +1,4 @@
-package gateway
+package logic
 
 import (
 	"net/http"
@@ -6,8 +6,6 @@ import (
 	"net"
 	"strconv"
 	"encoding/json"
-	"crypto/tls"
-	"github.com/owenliang/go-push/common"
 )
 
 type Service struct {
@@ -24,7 +22,6 @@ func handlePushAll(resp http.ResponseWriter, req *http.Request) {
 		err error
 		items string
 		msgArr []json.RawMessage
-		msgIdx int
 	)
 	if err = req.ParseForm(); err != nil {
 		return
@@ -35,9 +32,7 @@ func handlePushAll(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for msgIdx, _  = range msgArr {
-		G_merger.PushAll(&msgArr[msgIdx])
-	}
+	G_gateConnMgr.PushAll(msgArr)
 }
 
 // 房间推送POST room=xxx&msg
@@ -47,7 +42,6 @@ func handlePushRoom(resp http.ResponseWriter, req *http.Request) {
 		room string
 		items string
 		msgArr []json.RawMessage
-		msgIdx int
 	)
 	if err = req.ParseForm(); err != nil {
 		return
@@ -60,23 +54,7 @@ func handlePushRoom(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for msgIdx, _  = range msgArr {
-		G_merger.PushRoom(room, &msgArr[msgIdx])
-	}
-}
-
-// 统计
-func handleStats(resp http.ResponseWriter, req *http.Request) {
-	var (
-		data []byte
-		err error
-	)
-
-	if data, err = G_stats.Dump(); err != nil {
-		return
-	}
-
-	resp.Write(data)
+	G_gateConnMgr.PushRoom(room, msgArr)
 }
 
 func InitService() (err error) {
@@ -90,14 +68,8 @@ func InitService() (err error) {
 	mux = http.NewServeMux()
 	mux.HandleFunc("/push/all", handlePushAll)
 	mux.HandleFunc("/push/room", handlePushRoom)
-	mux.HandleFunc("/stats", handleStats)
 
-	// TLS证书解析验证
-	if _, err = tls.LoadX509KeyPair(G_config.ServerPem, G_config.ServerKey); err != nil {
-		return common.ERR_CERT_INVALID
-	}
-
-	// HTTP/2 TLS服务
+	// HTTP/1服务
 	server = &http.Server{
 		ReadTimeout: time.Duration(G_config.ServiceReadTimeout) * time.Millisecond,
 		WriteTimeout: time.Duration(G_config.ServiceWriteTimeout) * time.Millisecond,
@@ -115,7 +87,7 @@ func InitService() (err error) {
 	}
 
 	// 拉起服务
-	go server.ServeTLS(listener, G_config.ServerPem, G_config.ServerKey)
+	go server.Serve(listener)
 
 	return
 }
