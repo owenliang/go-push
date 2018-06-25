@@ -22,8 +22,8 @@
 
 ## bandwidth
 
-![bandwidth]()
+![bandwidth](https://github.com/owenliang/go-push/blob/master/bandwidth.png?raw=true)
 
 ## cpu usage
 
-![cpu usage]()
+![cpu usage](https://github.com/owenliang/go-push/blob/master/cpu.png?raw=true)
