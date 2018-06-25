@@ -16,6 +16,8 @@ type Config struct {
 	MergerWorkerCount int `json:"mergerWorkerCount"`
 	MergerChannelSize int `json:"mergerChannelSize"`
 	ServicePort int `json:"servicePort"`
+	ServerPem string `json:"serverPem"`
+	ServerKey string `json:"serverKey"`
 	BucketCount int `json:"bucketCount"`
 	BucketWorkerCount int `json:"bucketWorkerCount"`
 	MaxJoinRoom int`json:"maxJoinRoom"`

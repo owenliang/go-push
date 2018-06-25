@@ -6,6 +6,7 @@ import (
 	"net"
 	"strconv"
 	"encoding/json"
+	"crypto/tls"
 )
 
 type Service struct {
@@ -79,7 +80,12 @@ func InitService() (err error) {
 	mux.HandleFunc("/push/room", handlePushRoom)
 	mux.HandleFunc("/stats", handleStats)
 
-	// HTTP服务
+	// TLS证书解析验证
+	if _, err = tls.LoadX509KeyPair(G_config.ServerPem, G_config.ServerKey); err != nil {
+		return ERR_CERT_INVALID
+	}
+
+	// HTTP/2 TLS服务
 	server = &http.Server{
 		ReadTimeout: time.Duration(2000) * time.Millisecond,
 		WriteTimeout: time.Duration(2000) * time.Millisecond,
@@ -97,7 +103,7 @@ func InitService() (err error) {
 	}
 
 	// 拉起服务
-	go server.Serve(listener)
+	go server.ServeTLS(listener, G_config.ServerPem, G_config.ServerKey)
 
 	return
 }

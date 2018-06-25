@@ -23,8 +23,14 @@
   "消息合并队列的容量": "每个房间消息合并线程有一个队列, 推送量超过队列将被丢弃",
   "mergerChannelSize": 1000,
 
-  "内部HTTP端口": "严禁该端口暴露到外网",
+  "内部通讯HTTP2端口": "严禁该端口暴露到外网",
   "servicePort": 7788,
+
+  "内部通讯HTTP2 TLS证书": "私有证书,默认有效期10年",
+  "serverPem": "./default.pem",
+
+  "内部通讯HTTP2 TLS密钥": "与证书配对",
+  "serverKey": "./default.key",
 
   "连接分桶的数量": "桶越多, 推送的锁粒度越小, 推送并发度越高",
   "bucketCount": 512,
