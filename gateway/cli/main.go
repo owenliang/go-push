@@ -14,7 +14,7 @@ var (
 )
 
 func initArgs() {
-	flag.StringVar(&confFile, "config", "./go-push.json", "where go-push.json is.")
+	flag.StringVar(&confFile, "config", "./gateway.json", "where gateway.json is.")
 	flag.Parse()
 }
 

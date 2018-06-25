@@ -21,17 +21,22 @@ var (
 func handlePushAll(resp http.ResponseWriter, req *http.Request) {
 	var (
 		err error
-		msg string
-		pushMsg json.RawMessage
+		items string
+		msgArr []json.RawMessage
+		msgIdx int
 	)
 	if err = req.ParseForm(); err != nil {
 		return
 	}
 
-	msg = req.PostForm.Get("msg")
+	items = req.PostForm.Get("items")
+	if err = json.Unmarshal([]byte(items), &msgArr); err != nil {
+		return
+	}
 
-	pushMsg = json.RawMessage(msg)
-	G_merger.PushAll(&pushMsg)
+	for msgIdx, _  = range msgArr {
+		G_merger.PushAll(&msgArr[msgIdx])
+	}
 }
 
 // 房间推送POST room=xxx&msg
@@ -39,18 +44,24 @@ func handlePushRoom(resp http.ResponseWriter, req *http.Request) {
 	var (
 		err error
 		room string
-		msg string
-		pushMsg json.RawMessage
+		items string
+		msgArr []json.RawMessage
+		msgIdx int
 	)
 	if err = req.ParseForm(); err != nil {
 		return
 	}
 
 	room = req.PostForm.Get("room")
-	msg = req.PostForm.Get("msg")
+	items = req.PostForm.Get("items")
 
-	pushMsg = json.RawMessage(msg)
-	G_merger.PushRoom(room, &pushMsg)
+	if err = json.Unmarshal([]byte(items), &msgArr); err != nil {
+		return
+	}
+
+	for msgIdx, _  = range msgArr {
+		G_merger.PushRoom(room, &msgArr[msgIdx])
+	}
 }
 
 // 统计

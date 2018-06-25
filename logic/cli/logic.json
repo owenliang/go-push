@@ -1,0 +1,18 @@
+{
+  "HTTP/1服务端口": "接收业务方调用",
+  "servicePort": 7799,
+
+  "网关列表": "推送将分发给所有网关",
+  "gatewayList": [
+    {
+      "hostname": "localhost",
+      "port": 7788
+    }
+  ],
+
+  "每个网关的最大拥塞推送数": "当消息拥塞时, 后续发往该网关的消息将被丢弃",
+  "gatewayMaxPendingCount": 200000,
+
+  "每条推送的最大重试次数": "超过重试次数后, 消息将被丢弃",
+  "gatewayPushRetry": 3
+}
