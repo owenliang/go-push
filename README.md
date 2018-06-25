@@ -18,7 +18,10 @@
 
 # benchmark
 
-16 vcore
+## environment
+
+* 16 vcore
+* client, logic, gateway deployed together
 
 ## bandwidth
 
