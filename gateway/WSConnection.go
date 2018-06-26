@@ -92,6 +92,7 @@ func InitWSConnection(connId uint64, wsSocket *websocket.Conn) (wsConnection *WS
 func (wsConnection *WSConnection) SendMessage(message *common.WSMessage) (err error) {
 	select {
 	case wsConnection.outChan <- message:
+		SendMessageTotal_INCR()
 	case <- wsConnection.closeChan:
 		err = common.ERR_CONNECTION_LOSS
 	default:	// 写操作不会阻塞, 因为channel已经预留给websocket一定的缓冲空间

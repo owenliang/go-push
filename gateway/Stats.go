@@ -10,6 +10,7 @@ type Stats struct {
 	OnlineConnections int64 `json:"onlineConnections"`
 
 	// 反馈客户端的推送压力
+	SendMessageTotal int64 `json:"sendMessageTotal"`
 	SendMessageFail int64 `json:"sendMessageFail"`
 
 	// 反馈ConnMgr消息分发模块的压力
@@ -101,6 +102,10 @@ func DispatchFail_INCR() {
 
 func SendMessageFail_INCR() {
 	atomic.AddInt64(&G_stats.SendMessageFail, 1)
+}
+
+func SendMessageTotal_INCR() {
+	atomic.AddInt64(&G_stats.SendMessageTotal, 1)
 }
 
 func (stats *Stats) Dump() (data []byte, err error){
