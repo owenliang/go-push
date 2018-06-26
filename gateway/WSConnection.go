@@ -96,6 +96,7 @@ func (wsConnection *WSConnection) SendMessage(message *common.WSMessage) (err er
 		err = common.ERR_CONNECTION_LOSS
 	default:	// 写操作不会阻塞, 因为channel已经预留给websocket一定的缓冲空间
 		err = common.ERR_SEND_MESSAGE_FULL
+		SendMessageFail_INCR()
 	}
 	return
 }

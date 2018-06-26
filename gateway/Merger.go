@@ -88,10 +88,13 @@ func (worker *MergeWorker) mergeWorkerMain() {
 		timeoutBatch *PushBatch
 		existed bool
 		isCreated bool
+		err error
 	)
 	for {
 		select {
 		case context = <- worker.contextChan:
+			MergerPending_DESC()
+
 			isCreated = false
 			// 按房间合并
 			if worker.mergeType == common.PUSH_TYPE_ROOM {
@@ -144,7 +147,20 @@ func (worker *MergeWorker) mergeWorkerMain() {
 			}
 		}
 		// 提交批次
-		worker.commitBatch(batch)
+		err = worker.commitBatch(batch)
+
+		// 打点统计
+		if worker.mergeType == common.PUSH_TYPE_ALL {
+			MergerAllTotal_INCR(int64(len(batch.items)))
+			if err != nil {
+				MergerAllFail_INCR(int64(len(batch.items)))
+			}
+		} else if worker.mergeType == common.PUSH_TYPE_ROOM {
+			MergerRoomTotal_INCR(int64(len(batch.items)))
+			if err != nil {
+				MergerRoomFail_INCR(int64(len(batch.items)))
+			}
+		}
 	}
 }
 
@@ -169,6 +185,7 @@ func (worker *MergeWorker) pushRoom(room string, msg *json.RawMessage) (err erro
 	}
 	select {
 	case worker.contextChan <- context:
+		MergerPending_INCR()
 	default:
 		err = common.ERR_MERGE_CHANNEL_FULL
 	}
@@ -184,6 +201,7 @@ func (worker *MergeWorker) pushAll(msg *json.RawMessage) (err error) {
 	}
 	select {
 	case worker.contextChan <- context:
+		MergerPending_INCR()
 	default:
 		err = common.ERR_MERGE_CHANNEL_FULL
 	}

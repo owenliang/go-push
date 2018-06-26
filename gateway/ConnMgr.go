@@ -34,7 +34,7 @@ func (connMgr *ConnMgr)dispatchWorkerMain(dispatchWorkerIdx int) {
 	for {
 		select {
 		case pushJob = <- connMgr.dispatchChan:
-			PushAllPending_DESC()
+			DispatchPending_DESC()
 
 			// 序列化
 			if pushJob.wsMsg, err = common.EncodeWSMessage(pushJob.bizMsg); err != nil {
@@ -115,6 +115,8 @@ func (connMgr *ConnMgr) AddConn(wsConnection *WSConnection) {
 
 	bucket = connMgr.GetBucket(wsConnection)
 	bucket.AddConn(wsConnection)
+
+	OnlineConnections_INCR()
 }
 
 func (connMgr *ConnMgr) DelConn(wsConnection *WSConnection) {
@@ -124,6 +126,8 @@ func (connMgr *ConnMgr) DelConn(wsConnection *WSConnection) {
 
 	bucket = connMgr.GetBucket(wsConnection)
 	bucket.DelConn(wsConnection)
+
+	OnlineConnections_DESC()
 }
 
 func (connMgr *ConnMgr) JoinRoom(roomId string, wsConn *WSConnection) (err error) {
@@ -159,9 +163,10 @@ func (connMgr *ConnMgr) PushAll(bizMsg *common.BizMessage) (err error) {
 
 	select {
 	case 	connMgr.dispatchChan <- pushJob:
-		PushAllPending_INCR()
+		DispatchPending_INCR()
 	default:
 		err = common.ERR_DISPATCH_CHANNEL_FULL
+		DispatchFail_INCR()
 	}
 	return
 }
@@ -180,8 +185,10 @@ func (connMgr *ConnMgr) PushRoom(roomId string, bizMsg *common.BizMessage) (err 
 
 	select {
 	case 	connMgr.dispatchChan <- pushJob:
+		DispatchPending_INCR()
 	default:
 		err = common.ERR_DISPATCH_CHANNEL_FULL
+		DispatchFail_INCR()
 	}
 	return
 }
