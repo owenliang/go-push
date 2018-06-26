@@ -35,6 +35,10 @@ func main()  {
 		goto ERR
 	}
 
+	if err = logic.InitStats(); err != nil {
+		goto ERR
+	}
+
 	if err = logic.InitGateConnMgr(); err != nil {
 		goto ERR
 	}

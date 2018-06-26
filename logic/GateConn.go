@@ -47,16 +47,22 @@ func (gateConn *GateConn) PushAll(itemsJson []byte) (err error) {
 		apiUrl string
 		form url.Values
 		resp *http.Response
+		retry int
 	)
+
+	apiUrl = gateConn.schema + "/push/all"
 
 	form = url.Values{}
 	form.Set("items", string(itemsJson))
 
-	apiUrl = gateConn.schema + "/push/all"
-	if resp, err = gateConn.client.PostForm(apiUrl, form); err != nil {
-		return
+	for retry = 0; retry < G_config.GatewayPushRetry; retry++ {
+		if resp, err = gateConn.client.PostForm(apiUrl, form); err != nil {
+			PushFail_INCR()
+			continue
+		}
+		resp.Body.Close()
+		break
 	}
-	defer resp.Body.Close()
 	return
 }
 
@@ -66,16 +72,22 @@ func (gateConn *GateConn) PushRoom(room string, itemsJson []byte) (err error) {
 		apiUrl string
 		form url.Values
 		resp *http.Response
+		retry int
 	)
+
+	apiUrl = gateConn.schema + "/push/room"
 
 	form = url.Values{}
 	form.Set("room", room)
 	form.Set("items", string(itemsJson))
 
-	apiUrl = gateConn.schema + "/push/room"
-	if resp, err = gateConn.client.PostForm(apiUrl, form); err != nil {
-		return
+	for retry = 0; retry < G_config.GatewayPushRetry; retry++ {
+		if resp, err = gateConn.client.PostForm(apiUrl, form); err != nil {
+			PushFail_INCR()
+			continue
+		}
+		resp.Body.Close()
+		break
 	}
-	defer resp.Body.Close()
 	return
 }

@@ -57,6 +57,20 @@ func handlePushRoom(resp http.ResponseWriter, req *http.Request) {
 	G_gateConnMgr.PushRoom(room, msgArr)
 }
 
+// 处理统计
+func handleStats(resp http.ResponseWriter, req *http.Request) {
+	var (
+		data []byte
+		err error
+	)
+
+	if data, err = G_stats.Dump(); err != nil {
+		return
+	}
+
+	resp.Write(data)
+}
+
 func InitService() (err error) {
 	var (
 		mux *http.ServeMux
@@ -68,6 +82,7 @@ func InitService() (err error) {
 	mux = http.NewServeMux()
 	mux.HandleFunc("/push/all", handlePushAll)
 	mux.HandleFunc("/push/room", handlePushRoom)
+	mux.HandleFunc("/stats", handleStats)
 
 	// HTTP/1服务
 	server = &http.Server{

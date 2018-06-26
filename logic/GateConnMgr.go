@@ -101,7 +101,9 @@ func (gateConnMgr *GateConnMgr) PushAll(items []json.RawMessage) (err error) {
 
 	select {
 	case gateConnMgr.dispatchChan <- pushJob:
+		DispatchTotal_INCR(int64(len(items)))
 	default:
+		DispatchFail_INCR(int64(len(items)))
 		err = common.ERR_LOGIC_DISPATCH_CHANNEL_FULL
 	}
 	return
@@ -120,7 +122,9 @@ func (gateConnMgr *GateConnMgr) PushRoom(roomId string, items []json.RawMessage)
 
 	select {
 	case gateConnMgr.dispatchChan <- pushJob:
+		DispatchTotal_INCR(int64(len(items)))
 	default:
+		DispatchFail_INCR(int64(len(items)))
 		err = common.ERR_LOGIC_DISPATCH_CHANNEL_FULL
 	}
 	return
