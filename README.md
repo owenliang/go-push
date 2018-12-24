@@ -1,13 +1,32 @@
 # go-push
 
-用GO做推送
+golang实现的、可扩展的通用消息推送原型。
 
-# Dependency
+# 安装
 
-* golang.org/x/net/http2 (注: GFW已墙, 请到海外服务器下载)
-* github.com/gorilla/websocket
+项目采用Godep工具管理依赖，下载源码后可以直接编译，无需手动安装依赖。
 
-# Arch
+* 导出GOPATH环境变量
+
+* 下载go-push
+
+```
+go get github.com/owenliang/go-push
+```
+
+* 编译gateway服务
+
+```
+cd $GOPATH/src/github.com/owenliang/go-push/gateway/cli && go build
+```
+
+* 编译logic服务
+
+```
+cd $GOPATH/src/github.com/owenliang/go-push/logic/cli && go build
+```
+
+# 架构
 
 * gateway: 长连接网关
     * 海量长连接按BUCKET打散, 减小推送遍历的锁粒度
@@ -15,42 +34,42 @@
 * logic: 逻辑服务器
     * 本身无状态, 负责将推送消息分发到所有gateway节点
     * 对调用方暴露HTTP/1接口, 方便业务对接
-    * 采用HTTP/2长连接RPC向gateway分发消息
+    * 采用HTTP/2长连接RPC向gateway集群分发消息
 
-# May be a problem
+# 潜在问题
 
 * 推送主要瓶颈是gateway层而不是内部通讯, 所以gateway和logic之间仍旧采用了小包通讯(对网卡有PPS压力), 同时logic为业务提供了批量推送接口来缓解特殊需求.
 
-# Benchmark
+# 压测
 
-## environment
+## 环境
 
 * 16 vcore
 * client, logic, gateway deployed together
 
-## Bandwidth
+## 带宽
 
 ![bandwidth](https://github.com/owenliang/go-push/blob/master/bandwidth.png?raw=true)
 
-## Cpu Usage
+## CPU占用
 
 ![cpu usage](https://github.com/owenliang/go-push/blob/master/cpu.png?raw=true)
 
-# API
+# logic的推送API
 
-## 全员广播
+* 全员广播
 
 ```
 curl http://localhost:7799/push/all -d 'items=[{"msg": "hi"},{"msg": "bye"}]'
 ```
 
-## 房间广播
+* 房间广播
 
 ```
 curl http://localhost:7799/push/room -d 'room=default&items=[{"msg": "hi"},{"msg": "bye"}]'
 ```
 
-## Protocol
+## gateway的websocekt协议
 
 * PING(upstream)
 

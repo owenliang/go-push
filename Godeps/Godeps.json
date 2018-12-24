@@ -1,0 +1,51 @@
+{
+	"ImportPath": "github.com/owenliang/go-push",
+	"GoVersion": "go1.10",
+	"GodepVersion": "v80",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Comment": "v1.4.0-6-g95ba29e",
+			"Rev": "95ba29eb981bbb27d92e1f70bf8a1949452d926b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http/httpguts",
+			"Rev": "927f97764cc334a6575f4b7a1584a147864d5723"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http2",
+			"Rev": "927f97764cc334a6575f4b7a1584a147864d5723"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http2/hpack",
+			"Rev": "927f97764cc334a6575f4b7a1584a147864d5723"
+		},
+		{
+			"ImportPath": "golang.org/x/net/idna",
+			"Rev": "927f97764cc334a6575f4b7a1584a147864d5723"
+		},
+		{
+			"ImportPath": "golang.org/x/text/secure/bidirule",
+			"Comment": "v0.3.0-68-g17bcc04",
+			"Rev": "17bcc049122f272a32787ba38073ee47433023e9"
+		},
+		{
+			"ImportPath": "golang.org/x/text/transform",
+			"Comment": "v0.3.0-68-g17bcc04",
+			"Rev": "17bcc049122f272a32787ba38073ee47433023e9"
+		},
+		{
+			"ImportPath": "golang.org/x/text/unicode/bidi",
+			"Comment": "v0.3.0-68-g17bcc04",
+			"Rev": "17bcc049122f272a32787ba38073ee47433023e9"
+		},
+		{
+			"ImportPath": "golang.org/x/text/unicode/norm",
+			"Comment": "v0.3.0-68-g17bcc04",
+			"Rev": "17bcc049122f272a32787ba38073ee47433023e9"
+		}
+	]
+}
