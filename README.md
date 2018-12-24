@@ -71,19 +71,31 @@ curl http://localhost:7799/push/room -d 'room=default&items=[{"msg": "hi"},{"msg
 
 ## gateway的websocekt协议
 
-* PING(upstream)
+* PING(客户端->服务端)
 
 ```
 {"type": "PING", "data": {}}
 ```
 
-* PONG(downstream)
+* PONG(服务端->客户端)
 
 ```
 {"type": "PONG", "data": {}}
 ```
 
-* PUSH(downstream)
+* JOIN(客户端->服务端)
+
+```
+{"type": "JOIN", "data": {"room": "fengtimo"}}
+```
+
+* LEAVE(客户端->服务端)
+
+```
+{"type": "LEAVE", "data": {"room": "fengtimo"}}
+```
+
+* PUSH(服务端->客户端)
 
 ```
 {"type": "PUSH", "data": {"items": [{"name": "go-push"}, {"age": "1"}]}}
