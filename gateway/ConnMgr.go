@@ -1,6 +1,8 @@
 package gateway
 
-import "github.com/owenliang/go-push/common"
+import (
+	"github.com/owenliang/go-push/common"
+)
 
 // 推送任务
 type PushJob struct {
@@ -105,6 +107,11 @@ func InitConnMgr() (err error) {
 
 func (connMgr *ConnMgr) GetBucket(wsConnection *WSConnection) (bucket *Bucket) {
 	bucket = connMgr.buckets[wsConnection.connId % uint64(len(connMgr.buckets))]
+	return
+}
+
+func (connMgr *ConnMgr) GetBucketByConnId(connId uint64) (bucket *Bucket) {
+	bucket = connMgr.buckets[connId % uint64(len(connMgr.buckets))]
 	return
 }
 

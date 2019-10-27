@@ -1,22 +1,22 @@
 package gateway
 
 import (
-	"sync"
 	"github.com/owenliang/go-push/common"
+	"sync"
 )
 
 type Bucket struct {
 	rwMutex sync.RWMutex
-	index int // 我是第几个桶
-	id2Conn map[uint64]*WSConnection	// 连接列表(key=连接唯一ID)
-	rooms map[string]*Room // 房间列表
+	index   int                      // 我是第几个桶
+	id2Conn map[uint64]*WSConnection // 连接列表(key=连接唯一ID)
+	rooms   map[string]*Room         // 房间列表
 }
 
 func InitBucket(bucketIdx int) (bucket *Bucket) {
 	bucket = &Bucket{
-		index: bucketIdx,
+		index:   bucketIdx,
 		id2Conn: make(map[uint64]*WSConnection),
-		rooms: make(map[string]*Room),
+		rooms:   make(map[string]*Room),
 	}
 	return
 }
@@ -38,7 +38,7 @@ func (bucket *Bucket) DelConn(wsConn *WSConnection) {
 func (bucket *Bucket) JoinRoom(roomId string, wsConn *WSConnection) (err error) {
 	var (
 		existed bool
-		room *Room
+		room    *Room
 	)
 	bucket.rwMutex.Lock()
 	defer bucket.rwMutex.Unlock()
@@ -57,7 +57,7 @@ func (bucket *Bucket) JoinRoom(roomId string, wsConn *WSConnection) (err error) 
 func (bucket *Bucket) LeaveRoom(roomId string, wsConn *WSConnection) (err error) {
 	var (
 		existed bool
-		room *Room
+		room    *Room
 	)
 	bucket.rwMutex.Lock()
 	defer bucket.rwMutex.Unlock()
@@ -97,7 +97,7 @@ func (bucket *Bucket) PushAll(wsMsg *common.WSMessage) {
 // 推送给某个房间的所有用户
 func (bucket *Bucket) PushRoom(roomId string, wsMsg *common.WSMessage) {
 	var (
-		room *Room
+		room    *Room
 		existed bool
 	)
 
@@ -113,4 +113,18 @@ func (bucket *Bucket) PushRoom(roomId string, wsMsg *common.WSMessage) {
 
 	// 向房间做推送
 	room.Push(wsMsg)
+}
+
+// 推送给某用户
+func (bucket *Bucket) PushConn(connId uint64, wsMsg *common.WSMessage) {
+	var (
+		wsConn  *WSConnection
+		existed bool
+	)
+
+	wsConn, existed = bucket.id2Conn[connId]
+	if existed {
+		wsConn.SendMessage(wsMsg)
+	}
+
 }
