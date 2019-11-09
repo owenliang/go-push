@@ -4,9 +4,7 @@ golang实现的、可扩展的通用消息推送原型。
 
 # 安装
 
-项目采用Godep工具管理依赖，下载源码后可以直接编译，无需手动安装依赖。
-
-* 导出GOPATH环境变量
+已升级到golang1.13，基于gomod管理依赖。
 
 * 下载go-push
 
@@ -14,16 +12,23 @@ golang实现的、可扩展的通用消息推送原型。
 go get github.com/owenliang/go-push
 ```
 
+* 安装依赖
+
+```
+export GOPROXY=goproxy.io
+go mod download
+```
+
 * 编译gateway服务
 
 ```
-cd $GOPATH/src/github.com/owenliang/go-push/gateway/cli && go build
+cd gateway/cli && go build && cd -
 ```
 
 * 编译logic服务
 
 ```
-cd $GOPATH/src/github.com/owenliang/go-push/logic/cli && go build
+cd logic/cli && go build && cd -
 ```
 
 # 架构
