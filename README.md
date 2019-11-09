@@ -114,4 +114,4 @@ curl http://localhost:7799/push/room -d 'room=default&items=[{"msg": "hi"},{"msg
 
 Go微信群：
 
-![wechat](https://github.com/owenliang/go-push/blob/master/E0B82999-82BB-4963-BC2D-FDEAF42230FC.png?raw=true)
+![wechat](https://github.com/owenliang/go-push/blob/master/E0B82999-82BB-4963-BC2D-FDEAF42230FC.jpeg?raw=true)
