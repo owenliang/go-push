@@ -74,6 +74,12 @@ curl http://localhost:7799/push/all -d 'items=[{"msg": "hi"},{"msg": "bye"}]'
 curl http://localhost:7799/push/room -d 'room=default&items=[{"msg": "hi"},{"msg": "bye"}]'
 ```
 
+* 单用户推送
+
+```
+curl http://localhost:7799/push/conn -d 'conn=1572175375&items=[{"msg": "hi"},{"msg": "bye"}]'
+```
+
 ## gateway的websocekt协议
 
 * PING(客户端->服务端)
